@@ -31,7 +31,7 @@ func Handle500(w http.ResponseWriter) {
 	w.WriteHeader(http.StatusInternalServerError)
 	file, err := helpers.LoadFile("./httpErrorHandler/500.html")
 	if err != nil {
-		fmt.Fprintf(w, "Some dipshit deleted the default 404 and didn't replace it. At any rate, there was a server error. Try again later.")
+		fmt.Fprintf(w, "Some dipshit deleted the default 500 and didn't replace it. At any rate, there was a server error. Try again later.")
 	} else {
 		fmt.Fprintf(w, file)
 	}
