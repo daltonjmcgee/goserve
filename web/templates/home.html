@@ -1,0 +1,27 @@
+{{ define "home" }}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/style.css">
+  <title>{{ block "title" . }}{{ end }}</title>
+</head>
+
+<body>
+  <header>
+    {{ block "header" . }}{{ end }}
+  </header>
+  <main>
+    {{ block "content" . }}{{ end }}
+  </main>
+  <footer>
+    {{ block "footer" . }}{{ end }}
+  </footer>
+  <script src="/static/main.js"></script>
+</body>
+
+</html>
+{{ end }}
