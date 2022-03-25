@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "watch": "rollup --config rollup.config.js --watch",
+    "watch": "rollup --config rollup.config.dev.js --watch",
     "serve": "cd app && go run .",
     "dev": "yarn watch & yarn serve"
   },

@@ -1,8 +1,4 @@
-'use strict';
-
-function componentA(){
+'use strict';function componentA(){
   console.log('componentA');
   return;
-}
-
-componentA();
+}componentA();//# sourceMappingURL=main.js.map
