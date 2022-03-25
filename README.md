@@ -21,3 +21,4 @@ This project comes out of my interest in building a super-light HTTP Server that
 - Make noSQL.json file writeable from the admin panel.
 - Write tests
 - Create an environment that imports each module and make sure it works.
+- Incorporate Vite
