@@ -145,12 +145,9 @@ func handleStatic(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func doNothing(w http.ResponseWriter, r *http.Request) {}
-
 func CreateServer() {
 	fmt.Printf("\n\nServer running at %s:%s", conf["url"], conf["port"])
 	http.HandleFunc("/", handleGet)
 	http.HandleFunc("/static/", handleStatic)
-	http.HandleFunc("/favicon.ico", doNothing)
 	log.Fatal(http.ListenAndServe(":"+conf["port"], nil))
 }
