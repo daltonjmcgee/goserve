@@ -5,9 +5,9 @@ import (
 	"goserve/helpers"
 )
 
-func ReturnConfig() map[string]string {
+func ReturnConfig(configFile string) map[string]string {
 	var config map[string]string
-	configJson, _ := helpers.LoadFile("./config.dev.json")
+	configJson, _ := helpers.LoadFile(configFile)
 	json.Unmarshal([]byte(configJson), &config)
 	return config
 }
