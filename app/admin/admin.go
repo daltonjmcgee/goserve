@@ -33,27 +33,22 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		jsonBytes, err := helpers.LoadFile(conf["databasePath"])
 
 		if err != nil {
-			// This should probably throw a different error
-			fmt.Fprintf(w, conf["databasePath"])
+			fmt.Fprint(w, "Database could not be found.")
 			return
 		}
 
 		jsonMap := map[string][]interface{}{}
 		json.Unmarshal([]byte(jsonBytes), &jsonMap)
 
-		if err != nil {
-			fmt.Fprint(w, err)
-		} else {
-			for _, val := range jsonMap["users"] {
-				creds, ok := val.(map[string]interface{})
-				if !ok {
-					fmt.Fprintf(w, "type map[string]interface{} required; got %T", val)
-				}
-				if creds["email"] == email && creds["password"] == password {
-					fmt.Fprint(w, "Login Successful")
-				} else {
-					fmt.Fprint(w, "Username or Password could not be verified.")
-				}
+		for _, val := range jsonMap["users"] {
+			creds, ok := val.(map[string]interface{})
+			if !ok {
+				fmt.Fprintf(w, "type map[string]interface{} required; got %T", val)
+			}
+			if creds["email"] == email && creds["password"] == password {
+				fmt.Fprint(w, "Login Successful")
+			} else {
+				fmt.Fprint(w, "Username or Password could not be verified.")
 			}
 		}
 	}
