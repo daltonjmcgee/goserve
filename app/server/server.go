@@ -10,22 +10,11 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"regexp"
 	"strings"
 )
 
-var configFile string
-
-func init() {
-	if len(os.Args) > 1 && os.Args[1][:5] == "-test" {
-		configFile = "../config.dev.json"
-	} else {
-		configFile = "config.dev.json"
-	}
-}
-
-var conf map[string]string = config.ReturnConfig(configFile)
+var conf map[string]string = config.ReturnConfig("config.dev.json")
 
 func methodCheck(w http.ResponseWriter, r *http.Request, method string) {
 	if r.Method != method {
