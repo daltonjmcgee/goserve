@@ -40,17 +40,18 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		jsonMap := map[string][]interface{}{}
 		json.Unmarshal([]byte(jsonBytes), &jsonMap)
 
+		// Loop over all users and look for match to login info
 		for _, val := range jsonMap["users"] {
 			creds, ok := val.(map[string]interface{})
 			if !ok {
 				fmt.Fprintf(w, "type map[string]interface{} required; got %T", val)
 			}
 			if creds["email"] == email && creds["password"] == password {
-				fmt.Fprint(w, "Login Successful")
-			} else {
-				fmt.Fprint(w, "Username or Password could not be verified.")
+				http.Redirect(w, r, "/admin/panel", http.StatusFound)
+				return
 			}
 		}
+		fmt.Fprint(w, "Username or Password could not be verified.")
 	}
 	return
 }

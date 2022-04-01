@@ -20,6 +20,14 @@
     {
       "email": "dalton.mc@gmail.com",
       "password": "password"
+    },
+    {
+      "email": "doors@fake.com",
+      "password": "seltzer"
+    },
+    {
+      "email": "cat@forks.com",
+      "password": "couch"
     }
   ]
 }
