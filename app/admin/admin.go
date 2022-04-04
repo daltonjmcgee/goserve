@@ -1,12 +1,15 @@
 package admin
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"goserve/config"
 	"goserve/helpers"
 	"goserve/httpErrorHandler"
 	"net/http"
+
+	"golang.org/x/crypto/argon2"
 )
 
 var adminPath string = "./admin/public/"
@@ -43,14 +46,23 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		// Loop over all users and look for match to login info
 		for _, val := range jsonMap["users"] {
 			creds, ok := val.(map[string]interface{})
+
 			if !ok {
 				fmt.Fprintf(w, "type map[string]interface{} required; got %T", val)
 			}
-			if creds["email"] == email && creds["password"] == password {
-				http.Redirect(w, r, "/admin/panel", http.StatusFound)
-				return
+
+			// check to see if email exists first, then check to see if password is correct
+			if creds["email"] == email {
+				// hash given password with stored salt and convert to hex string to compare against database
+				hashedPwd := hex.EncodeToString(argon2.IDKey([]byte(password), []byte(creds["salt"].(string)), 1, 64*1024, 4, 32))
+				fmt.Println("\n\n", hashedPwd)
+				if creds["password"] == hashedPwd {
+					http.Redirect(w, r, "/admin/panel", http.StatusFound)
+					return
+				}
 			}
 		}
+
 		fmt.Fprint(w, "Username or Password could not be verified.")
 	}
 	return

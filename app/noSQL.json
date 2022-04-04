@@ -19,15 +19,18 @@
   "users": [
     {
       "email": "dalton.mc@gmail.com",
-      "password": "password"
+      "password": "d3127921a650b59ce28c0eaf2651bcb32b459654f2b18d7fb40a92dfb50731d9",
+      "salt": "tRDZ1pom6*ar#$ZXGE74l@KzB8oZJ#VTmQ7U1Zjm&5l$YDex*J1LL$Ls4OuF@2p7"
     },
     {
       "email": "doors@fake.com",
-      "password": "seltzer"
+      "password": "22dd2ca36b8436adceba61f5b01e22e43da2820ea021f016fab51c64e9c55b04",
+      "salt": "INkGufqRGPU3SsHbkS4!Hea#N2R6gkzbcgEiKuzCSc$yc^e6WW%33X1XF33eKT5p"
     },
     {
       "email": "cat@forks.com",
-      "password": "couch"
+      "password": "0d0f90a4f6b40e7bd01f6d71932a68e165d51f323c28b3eb7e6f0ee38038a6b3",
+      "salt": "hby%Rfrs&LBzLYGI9XxsLMdYC#Q6qB@eKzc95ppx&aGm8XPgjq6$&0p#4z%qZoYi"
     }
   ]
 }
