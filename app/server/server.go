@@ -60,77 +60,76 @@ func handleGet(w http.ResponseWriter, r *http.Request) {
 			httpErrorHandler.Handle500(w)
 		}
 		t.Execute(w, jsonMap)
-	} else {
-		files := append([]string{conf["publicPath"] + path + ".html"}, templates...)
-		t, err := template.ParseFiles(files...)
+	}
+	files := append([]string{conf["publicPath"] + path + ".html"}, templates...)
+	t, file_err := template.ParseFiles(files...)
 
-		if err == nil {
-			t.Execute(w, nil)
-		} else {
+	if file_err == nil {
+		t.Execute(w, nil)
+		return
+	}
 
-			// Take the URI, strip off the last data to get the directory, then
-			// get a list of all files in the directory to be looped over.
-			// If the directory doesn't exist throw a 404.
-			fileName := strings.Split(path, "/")
-			queryableValue := &fileName[len(fileName)-1]
-			directory := strings.Join(fileName[:len(fileName)-1], "/")
-			directoryFiles, err := ioutil.ReadDir(conf["publicPath"] + fmt.Sprintf("/%s", directory))
+	// Take the URI, strip off the last data to get the directory, then
+	// get a list of all files in the directory to be looped over.
+	// If the directory doesn't exist throw a 404.
+	fileName := strings.Split(path, "/")
+	queryableValue := &fileName[len(fileName)-1]
+	directory := strings.Join(fileName[:len(fileName)-1], "/")
+	directoryFiles, err := ioutil.ReadDir(conf["publicPath"] + fmt.Sprintf("/%s", directory))
 
-			if err != nil {
-				httpErrorHandler.Handle404(w)
-				return
-			}
+	if err != nil {
+		httpErrorHandler.Handle404(w)
+		return
+	}
 
-			// Loop over all files in the directory and see if the template name matches
-			// any of the keys in the JSON data provided. If so, serve the first one found.
-			for _, file := range directoryFiles {
+	// Loop over all files in the directory and see if the template name matches
+	// any of the keys in the JSON data provided. If so, serve the first one found.
+	for _, file := range directoryFiles {
 
-				// Skip subdirectories.
-				if file.IsDir() {
-					continue
-				}
+		// Skip subdirectories.
+		if file.IsDir() {
+			continue
+		}
 
-				// Skip file if it doesn't match the template format.
-				isFile, _ := regexp.Match(`\[\w+\]`, []byte(file.Name()))
+		// Skip file if it doesn't match the template format.
+		isFile, _ := regexp.Match(`\[\w+\]`, []byte(file.Name()))
 
-				if !isFile {
-					continue
-				}
+		if !isFile {
+			continue
+		}
 
-				jsonBytes, err := helpers.LoadFile(conf["databasePath"])
+		jsonBytes, err := helpers.LoadFile(conf["databasePath"])
 
-				if err != nil {
-					// This should probably throw a different error
-					httpErrorHandler.Handle404(w)
-					return
-				}
-
-				jsonMap := map[string][]interface{}{}
-				queryKey := regexp.MustCompile(`\[|\]`).Split(file.Name(), -1)[1]
-
-				json.Unmarshal([]byte(jsonBytes), &jsonMap)
-
-				for _, val := range jsonMap["data"] {
-					for key, value := range val.(map[string]interface{}) {
-						if key == queryKey && *queryableValue == value {
-							fullDirectory := conf["publicPath"] + fmt.Sprintf("%s/%s", directory, file.Name())
-							files := append([]string{fullDirectory}, templates...)
-							t, err := template.ParseFiles(files...)
-							if err != nil {
-								fmt.Println(err)
-								httpErrorHandler.Handle500(w)
-							} else {
-								t.Execute(w, val)
-							}
-							return
-						}
-					}
-				}
-			}
+		if err != nil {
+			// This should probably throw a different error
 			httpErrorHandler.Handle404(w)
 			return
 		}
+
+		jsonMap := map[string][]interface{}{}
+		queryKey := regexp.MustCompile(`\[|\]`).Split(file.Name(), -1)[1]
+
+		json.Unmarshal([]byte(jsonBytes), &jsonMap)
+
+		for _, val := range jsonMap["data"] {
+			for key, value := range val.(map[string]interface{}) {
+				if key == queryKey && *queryableValue == value {
+					fullDirectory := conf["publicPath"] + fmt.Sprintf("%s/%s", directory, file.Name())
+					files := append([]string{fullDirectory}, templates...)
+					t, err := template.ParseFiles(files...)
+					if err != nil {
+						fmt.Println(err)
+						httpErrorHandler.Handle500(w)
+					} else {
+						t.Execute(w, val)
+					}
+					return
+				}
+			}
+		}
 	}
+	httpErrorHandler.Handle404(w)
+	return
 }
 
 func handleStatic(w http.ResponseWriter, r *http.Request) {

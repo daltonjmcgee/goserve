@@ -29,42 +29,42 @@ func handleGet(w http.ResponseWriter, r *http.Request) {
 func handleLogin(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		httpErrorHandler.Handle405(w, r.Method)
-	} else {
-		r.ParseForm()
-		email := r.PostForm.Get("email")
-		password := r.PostForm.Get("password")
-		jsonBytes, err := helpers.LoadFile(conf["databasePath"])
-
-		if err != nil {
-			fmt.Fprint(w, "Database could not be found.")
-			return
-		}
-
-		jsonMap := map[string][]interface{}{}
-		json.Unmarshal([]byte(jsonBytes), &jsonMap)
-
-		// Loop over all users and look for match to login info
-		for _, val := range jsonMap["users"] {
-			creds, ok := val.(map[string]interface{})
-
-			if !ok {
-				fmt.Fprintf(w, "type map[string]interface{} required; got %T", val)
-			}
-
-			// check to see if email exists first, then check to see if password is correct
-			if creds["email"] == email {
-				// hash given password with stored salt and convert to hex string to compare against database
-				hashedPwd := hex.EncodeToString(argon2.IDKey([]byte(password), []byte(creds["salt"].(string)), 1, 64*1024, 4, 32))
-				fmt.Println("\n\n", hashedPwd)
-				if creds["password"] == hashedPwd {
-					http.Redirect(w, r, "/admin/panel", http.StatusFound)
-					return
-				}
-			}
-		}
-
-		fmt.Fprint(w, "Username or Password could not be verified.")
+		return
 	}
+
+	r.ParseForm()
+	email := r.PostForm.Get("email")
+	password := r.PostForm.Get("password")
+	jsonBytes, err := helpers.LoadFile(conf["databasePath"])
+
+	if err != nil {
+		fmt.Fprint(w, "Database could not be found.")
+		return
+	}
+
+	jsonMap := map[string][]interface{}{}
+	json.Unmarshal([]byte(jsonBytes), &jsonMap)
+
+	// Loop over all users and look for match to login info
+	for _, val := range jsonMap["users"] {
+		creds, ok := val.(map[string]interface{})
+
+		if !ok {
+			fmt.Fprintf(w, "type map[string]interface{} required; got %T", val)
+		}
+
+		// check to see if email exists first, then check to see if password is correct
+		if creds["email"] == email {
+			// hash given password with stored salt and convert to hex string to compare against database
+			hashedPwd := hex.EncodeToString(argon2.IDKey([]byte(password), []byte(creds["salt"].(string)), 1, 64*1024, 4, 32))
+			if creds["password"] == hashedPwd {
+				http.Redirect(w, r, "/admin/panel", http.StatusFound)
+				return
+			}
+		}
+	}
+
+	fmt.Fprint(w, "Username or Password could not be verified.")
 	return
 }
 
