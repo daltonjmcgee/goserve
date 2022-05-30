@@ -7,7 +7,9 @@ import (
 	"goserve/config"
 	"goserve/helpers"
 	"goserve/httpErrorHandler"
+	"html/template"
 	"net/http"
+	"strings"
 
 	"golang.org/x/crypto/argon2"
 )
@@ -17,13 +19,27 @@ var conf map[string]string = config.ReturnConfig("config.dev.json")
 
 func handleGet(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
-	file, err := helpers.LoadFile(adminPath + path[1:] + ".html")
+
+	jsonBytes, err := helpers.LoadFile(conf["databasePath"])
 
 	if err != nil {
+		// This should probably throw a different error
 		httpErrorHandler.Handle404(w)
-	} else {
-		fmt.Fprintf(w, file)
+		return
 	}
+
+	jsonMap := map[string][]interface{}{}
+
+	json.Unmarshal([]byte(jsonBytes), &jsonMap)
+
+	t, err := template.ParseFiles(adminPath + path[1:] + ".html")
+	if err != nil {
+		fmt.Println(err)
+		httpErrorHandler.Handle500(w)
+	} else {
+		t.Execute(w, jsonMap)
+	}
+	return
 }
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
@@ -68,9 +84,22 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func handleUpdate(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		httpErrorHandler.Handle405(w, r.Method)
+		return
+	}
+
+	r.ParseForm()
+	// var request []string
+	for key, val := range r.PostForm {
+		fmt.Println("\n", key, strings.Join(val, "\n"))
+	}
+	fmt.Fprintf(w, "DONE")
+}
+
 func handleStatic(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
-	fmt.Println(path)
 	if path != "/admin/static/" {
 		http.ServeFile(w, r, adminPath+path)
 	} else {
@@ -82,5 +111,6 @@ func AdminPanel() {
 	http.HandleFunc("/admin", handleGet)
 	http.HandleFunc("/admin/", handleGet)
 	http.HandleFunc("/admin/login", handleLogin)
+	http.HandleFunc("/admin/update", handleUpdate)
 	http.HandleFunc("/admin/static/", handleStatic)
 }

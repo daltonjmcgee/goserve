@@ -1,18 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/admin/style.css">
-  <title>Admin Panel</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/admin/static/style.css">
+    <title>Admin Panel</title>
 </head>
+
 <body>
-  <header><h1>Admin Panel v0.1</h1></header>
-  <main>
-    <h2>
-      Items
-    </h2>
-  </main>
+    <header>
+        <h1>Admin Panel v0.1</h1>
+    </header>
+    <main>
+        <form action="/admin/update" method="POST">
+            {{ range $i, $entry := .data }}
+                <fieldset name="{{ $i }}" id="{{ $entry.id }}">
+                    <input class="hidden" name="id-{{$i}}" readonly aria-readonly="true" type="text" value="{{ $entry.id }}">
+                    {{ range $j, $data := $entry }}
+                        <p>{{ $data }}</p>
+                    {{ end }}
+                </fieldset>
+            {{ end }}
+            <input type="submit" value="Update">
+        </form>
+        <h2>
+            <!-- {{ .users }} -->
+        </h2>
+    </main>
 </body>
+
 </html>

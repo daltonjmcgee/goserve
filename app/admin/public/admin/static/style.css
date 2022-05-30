@@ -10,4 +10,27 @@ main {
 form {
   width: fit-content;
   margin-inline: auto;
+  width: 50vw;
+  border: none;
+}
+
+fieldset {
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+input, textarea {
+    display: block;
+    width: 50vw;
+}
+
+input[type='submit'] {
+    padding: 0;
+    margin-block: 1rem;
+    margin-inline: auto;
+}
+
+.hidden {
+    display: none;
 }

@@ -2,5 +2,14 @@
 {{ block "title" nil }}Homepage{{ end }}
 {{ block "content" nil }}
 <h1>Hello Multiverse!</h1>
-<p>{{ . }}</p>
+{{ range $i,$datum := .data }}
+{{ $datum.id }}
+{{ range $j, $item := $datum.content}}
+{{ if eq $item.tag "h1"}}
+<h2>{{ $item.body }}</h2>
+{{ else }}
+<p>{{ $item.body }}</p>
+{{ end }}
+{{ end }}
+{{ end }}
 {{ end }}

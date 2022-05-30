@@ -60,6 +60,7 @@ func handleGet(w http.ResponseWriter, r *http.Request) {
 			httpErrorHandler.Handle500(w)
 		}
 		t.Execute(w, jsonMap)
+		return
 	}
 	files := append([]string{conf["publicPath"] + path + ".html"}, templates...)
 	t, file_err := template.ParseFiles(files...)

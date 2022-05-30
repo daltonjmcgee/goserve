@@ -1,0 +1,11 @@
+{{ template "home" . }}
+{{ block "title" nil }}{{ .pageTitle }}{{ end }}
+{{ block "content" nil}}
+{{ range $i, $item := .content }}
+{{ if eq $item.tag "h1"}}
+<h2>{{ $item.body }}</h2>
+{{ else }}
+<p>{{ $item.body }}</p>
+{{ end }}
+{{ end }}
+{{ end }}
