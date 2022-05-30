@@ -17,25 +17,36 @@ import (
 var adminPath string = "./admin/public/"
 var conf map[string]string = config.ReturnConfig("config.dev.json")
 
-func handleGet(w http.ResponseWriter, r *http.Request) {
-	path := r.URL.Path
-
+func getDb(w http.ResponseWriter, conf map[string]string) (error, map[string][]interface{}) {
 	jsonBytes, err := helpers.LoadFile(conf["databasePath"])
 
 	if err != nil {
-		// This should probably throw a different error
-		httpErrorHandler.Handle404(w)
-		return
+		httpErrorHandler.Handle500(w)
+		return err, nil
 	}
 
 	jsonMap := map[string][]interface{}{}
-
 	json.Unmarshal([]byte(jsonBytes), &jsonMap)
 
+	return nil, jsonMap
+}
+
+func handleGet(w http.ResponseWriter, r *http.Request) {
+	path := r.URL.Path
+	dbErr, jsonMap := getDb(w, conf)
+
+	if dbErr != nil {
+		return
+	}
+
 	t, err := template.ParseFiles(adminPath + path[1:] + ".html")
+
 	if err != nil {
-		fmt.Println(err)
-		httpErrorHandler.Handle500(w)
+		if strings.Contains(err.Error(), "no such file or directory") {
+			httpErrorHandler.Handle404(w)
+		} else {
+			httpErrorHandler.Handle500(w)
+		}
 	} else {
 		t.Execute(w, jsonMap)
 	}
@@ -51,15 +62,11 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	email := r.PostForm.Get("email")
 	password := r.PostForm.Get("password")
-	jsonBytes, err := helpers.LoadFile(conf["databasePath"])
+	dbErr, jsonMap := getDb(w, conf)
 
-	if err != nil {
-		fmt.Fprint(w, "Database could not be found.")
+	if dbErr != nil {
 		return
 	}
-
-	jsonMap := map[string][]interface{}{}
-	json.Unmarshal([]byte(jsonBytes), &jsonMap)
 
 	// Loop over all users and look for match to login info
 	for _, val := range jsonMap["users"] {
@@ -89,6 +96,8 @@ func handleUpdate(w http.ResponseWriter, r *http.Request) {
 		httpErrorHandler.Handle405(w, r.Method)
 		return
 	}
+
+	// jsonMap := getDb(w)
 
 	r.ParseForm()
 	// var request []string

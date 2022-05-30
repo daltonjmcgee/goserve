@@ -16,18 +16,24 @@
     <main>
         <form action="/admin/update" method="POST">
             {{ range $i, $entry := .data }}
-                <fieldset name="{{ $i }}" id="{{ $entry.id }}">
-                    <input class="hidden" name="id-{{$i}}" readonly aria-readonly="true" type="text" value="{{ $entry.id }}">
-                    {{ range $j, $data := $entry }}
-                        <p>{{ $data }}</p>
+              <fieldset name="{{ $i }}" id="{{ $entry.id }}">
+                  <input class="hidden" name="id-{{$i}}" readonly aria-readonly="true" type="text" value="{{ $entry.id }}">
+                  {{ range $j, $data := $entry }}
+                    {{if eq $j "content"}}
+                      {{ range $k, $datum := $data}}
+                        {{ if eq $datum.inputType "text"}}
+                          <input type="text" value="{{$datum.body}}">
+                        {{ end }}
+                        {{ if eq $datum.inputType "textarea"}}
+                            <textarea rows="10">{{$datum.body}}</textarea>
+                        {{ end }}
+                      {{ end }}
                     {{ end }}
-                </fieldset>
+                  {{ end }}
+              </fieldset>
             {{ end }}
             <input type="submit" value="Update">
         </form>
-        <h2>
-            <!-- {{ .users }} -->
-        </h2>
     </main>
 </body>
 

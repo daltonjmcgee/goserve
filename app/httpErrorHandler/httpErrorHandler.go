@@ -15,6 +15,7 @@ func Handle404(w http.ResponseWriter) {
 	} else {
 		fmt.Fprintf(w, file)
 	}
+	return
 }
 
 func Handle405(w http.ResponseWriter, method string) {
@@ -35,4 +36,5 @@ func Handle500(w http.ResponseWriter) {
 	} else {
 		fmt.Fprintf(w, file)
 	}
+	return
 }
